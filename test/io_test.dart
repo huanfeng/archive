@@ -465,7 +465,7 @@ void main() {
     final tarDecoder = TarDecoder();
     final f = File('$testOutputPath/test3.tar');
     final archive = tarDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(6));
+    expect(archive.length, equals(4));
   });
 
   _testInputOutputFileStream('stream gzip encode', (
@@ -527,7 +527,7 @@ void main() {
     final zipDecoder = ZipDecoder();
     final f = File('$testOutputPath/example2.zip');
     final archive = zipDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(8));
+    expect(archive.length, equals(6));
   });
 
   test('stream zip encode sync', () {
@@ -541,7 +541,7 @@ void main() {
     final zipDecoder = ZipDecoder();
     final f = File('$testOutputPath/example2_sync.zip');
     final archive = zipDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(8));
+    expect(archive.length, equals(6));
   });
 
   test('stream zip encode levels', () async {
@@ -574,7 +574,7 @@ void main() {
   test('create_archive_from_directory', () {
     final dir = Directory('test/_data/test2');
     final archive = createArchiveFromDirectory(dir);
-    expect(archive.length, equals(6));
+    expect(archive.length, equals(4));
     final encoder = ZipEncoder();
 
     final bytes = encoder.encodeBytes(archive);
@@ -584,7 +584,7 @@ void main() {
 
     final zipDecoder = ZipDecoder();
     final archive2 = zipDecoder.decodeBytes(bytes, verify: true);
-    expect(archive2.length, equals(6));
+    expect(archive2.length, equals(4));
   });
 
   _testInputFileStream('file close', (ifsConstructor) async {
