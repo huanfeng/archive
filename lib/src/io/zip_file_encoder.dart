@@ -113,7 +113,9 @@ class ZipFileEncoder {
       }
       if (file is Directory) {
         var filename = path.relative(file.path, from: dir.path);
+        filename = path.posix.fromUri(path.toUri(filename));
         filename = includeDirName ? '$dirName/$filename' : filename;
+
         final af = ArchiveFile.directory(filename);
         final stat = file.statSync();
         af.mode = stat.mode;
@@ -121,7 +123,8 @@ class ZipFileEncoder {
         _encoder.add(af);
       } else if (file is File) {
         final dirName = path.basename(dir.path);
-        final relPath = path.relative(file.path, from: dir.path);
+        var relPath = path.relative(file.path, from: dir.path);
+        relPath = path.posix.fromUri(path.toUri(relPath));
         addFileSync(
           file,
           includeDirName ? '$dirName/$relPath' : relPath,
@@ -155,6 +158,7 @@ class ZipFileEncoder {
       }
       if (file is Directory) {
         var filename = path.relative(file.path, from: dir.path);
+        filename = path.posix.fromUri(path.toUri(filename));
         filename = includeDirName ? '$dirName/$filename' : filename;
         final af = ArchiveFile.directory(filename);
         final stat = file.statSync();
@@ -163,7 +167,8 @@ class ZipFileEncoder {
         _encoder.add(af);
       } else if (file is File) {
         final dirName = path.basename(dir.path);
-        final relPath = path.relative(file.path, from: dir.path);
+        var relPath = path.relative(file.path, from: dir.path);
+        relPath = path.posix.fromUri(path.toUri(relPath));
         await addFile(
           file,
           includeDirName ? '$dirName/$relPath' : relPath,
@@ -176,8 +181,10 @@ class ZipFileEncoder {
 
   void addFileSync(File file, [String? filename, int? level]) {
     final fileStream = InputFileStream(file.path);
+    filename ??= path.basename(file.path);
+    filename = path.posix.fromUri(path.toUri(filename));
     final archiveFile =
-        ArchiveFile.stream(filename ?? path.basename(file.path), fileStream);
+        ArchiveFile.stream(filename, fileStream);
 
     archiveFile.lastModTime =
         (file.lastModifiedSync()).millisecondsSinceEpoch ~/ 1000;
@@ -189,8 +196,10 @@ class ZipFileEncoder {
 
   Future<void> addFile(File file, [String? filename, int? level]) async {
     final fileStream = InputFileStream(file.path);
+    filename ??= path.basename(file.path);
+    filename = path.posix.fromUri(path.toUri(filename));
     final archiveFile =
-        ArchiveFile.stream(filename ?? path.basename(file.path), fileStream);
+        ArchiveFile.stream(filename, fileStream);
 
     archiveFile.lastModTime =
         (await file.lastModified()).millisecondsSinceEpoch ~/ 1000;

@@ -106,6 +106,19 @@ void _testInputOutputFileStream(
 }
 
 void main() {
+  test('zipFileEncoder', () async {
+    final encoder = ZipFileEncoder();
+    encoder.create('$testOutputPath/zipFileEncoder.zip');
+    encoder.addDirectorySync(Directory('test/_data/test2'),
+        includeDirName: false);
+    encoder.closeSync();
+
+    final zip = ZipDecoder().decodeBytes(File('$testOutputPath/zipFileEncoder.zip').readAsBytesSync());
+    for (final f in zip) {
+      expect(f.name.contains('\\'), false, reason: f.name);
+    }
+  });
+
   test('inputExtension', () async {
     expect(getInputExtension('test.zip') == '.zip', isTrue);
     expect(getInputExtension('test.ZIP') == '.zip', isTrue);
@@ -451,7 +464,7 @@ void main() {
     final tarDecoder = TarDecoder();
     final f = File('$testOutputPath/test3.tar');
     final archive = tarDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(4));
+    expect(archive.length, equals(6));
   });
 
   _testInputOutputFileStream('stream gzip encode', (
@@ -513,7 +526,7 @@ void main() {
     final zipDecoder = ZipDecoder();
     final f = File('$testOutputPath/example2.zip');
     final archive = zipDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(6));
+    expect(archive.length, equals(8));
   });
 
   test('stream zip encode sync', () {
@@ -527,7 +540,7 @@ void main() {
     final zipDecoder = ZipDecoder();
     final f = File('$testOutputPath/example2_sync.zip');
     final archive = zipDecoder.decodeBytes(f.readAsBytesSync(), verify: true);
-    expect(archive.length, equals(6));
+    expect(archive.length, equals(8));
   });
 
   test('stream zip encode levels', () async {
@@ -560,7 +573,7 @@ void main() {
   test('create_archive_from_directory', () {
     final dir = Directory('test/_data/test2');
     final archive = createArchiveFromDirectory(dir);
-    expect(archive.length, equals(4));
+    expect(archive.length, equals(6));
     final encoder = ZipEncoder();
 
     final bytes = encoder.encodeBytes(archive);
@@ -570,7 +583,7 @@ void main() {
 
     final zipDecoder = ZipDecoder();
     final archive2 = zipDecoder.decodeBytes(bytes, verify: true);
-    expect(archive2.length, equals(4));
+    expect(archive2.length, equals(6));
   });
 
   _testInputFileStream('file close', (ifsConstructor) async {
