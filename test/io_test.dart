@@ -113,7 +113,8 @@ void main() {
         includeDirName: false);
     encoder.closeSync();
 
-    final zip = ZipDecoder().decodeBytes(File('$testOutputPath/zipFileEncoder.zip').readAsBytesSync());
+    final zip = ZipDecoder().decodeBytes(
+        File('$testOutputPath/zipFileEncoder.zip').readAsBytesSync());
     for (final f in zip) {
       expect(f.name.contains('\\'), false, reason: f.name);
     }

@@ -183,8 +183,7 @@ class ZipFileEncoder {
     final fileStream = InputFileStream(file.path);
     filename ??= path.basename(file.path);
     filename = path.posix.fromUri(path.toUri(filename));
-    final archiveFile =
-        ArchiveFile.stream(filename, fileStream);
+    final archiveFile = ArchiveFile.stream(filename, fileStream);
 
     archiveFile.lastModTime =
         (file.lastModifiedSync()).millisecondsSinceEpoch ~/ 1000;
@@ -198,8 +197,7 @@ class ZipFileEncoder {
     final fileStream = InputFileStream(file.path);
     filename ??= path.basename(file.path);
     filename = path.posix.fromUri(path.toUri(filename));
-    final archiveFile =
-        ArchiveFile.stream(filename, fileStream);
+    final archiveFile = ArchiveFile.stream(filename, fileStream);
 
     archiveFile.lastModTime =
         (await file.lastModified()).millisecondsSinceEpoch ~/ 1000;
