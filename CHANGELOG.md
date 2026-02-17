@@ -1,3 +1,8 @@
+## 4.0.9 - February 17, 2026
+
+- Fix extractFileToDisk file extension handling, where foo.bar.zip would fail.
+- 
+
 ## 4.0.8 - February 16, 2026
 
 - Remove dependency to crypto package
