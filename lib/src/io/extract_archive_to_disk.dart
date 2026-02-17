@@ -144,12 +144,17 @@ Future<void> extractArchiveToDisk(Archive archive, String outputPath,
   }
 }
 
-// a utility function to get the extension of the input file. Separated out
-// so it can be tested independently.
+// a utility function to get the extension of the input file.
 String getInputExtension(String inputPath) {
-  // get the extension of the input file with up to 2 components
-  // e.g. for file.tar.gz, it will return '.tar.gz'
-  return path.extension(inputPath, 2).toLowerCase();
+  final lowerPath = inputPath.toLowerCase();
+  if (lowerPath.endsWith('.tar.gz')) {
+    return '.tar.gz';
+  } else if (lowerPath.endsWith('.tar.bz2')) {
+    return '.tar.bz2';
+  } else if (lowerPath.endsWith('.tar.xz')) {
+    return '.tar.xz';
+  }
+  return path.extension(lowerPath);
 }
 
 Future<void> extractFileToDisk(String inputPath, String outputPath,
