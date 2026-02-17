@@ -707,7 +707,7 @@ class Inflate {
     8,
     8
   ];
-  final HuffmanTable _fixedLiteralLengthTable =
+  static final HuffmanTable _fixedLiteralLengthTable =
       HuffmanTable(_fixedLiteralLengths);
 
   /// Fixed huffman distance code table
@@ -743,7 +743,7 @@ class Inflate {
     5,
     5
   ];
-  final HuffmanTable _fixedDistanceTable =
+  static final HuffmanTable _fixedDistanceTable =
       HuffmanTable(_fixedDistanceTableData);
 
   /// Huffman order

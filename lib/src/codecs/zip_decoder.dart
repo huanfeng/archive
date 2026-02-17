@@ -37,18 +37,7 @@ class ZipDecoder {
 
       final entryMode = mode >> 16;
 
-      var isDirectory = false;
-      if (zfh.versionMadeBy >> 8 == 3) {
-        final fileType = entryMode & 0xf000;
-        // No determination can be made so we assume it's a file.)
-        if (fileType == 0x8000 || fileType == 0x0000) {
-          isDirectory = false;
-        } else {
-          isDirectory = true;
-        }
-      } else {
-        isDirectory = zf.filename.endsWith('/') || zf.filename.endsWith('\\');
-      }
+      var isDirectory = zf.filename.endsWith('/') || zf.filename.endsWith('\\');
 
       final filename = zf.filename;
 

@@ -241,10 +241,7 @@ class Deflate {
   void _lmInit() {
     _actualWindowSize = 2 * _windowSize;
 
-    _head[_hashSize - 1] = 0;
-    for (var i = 0; i < _hashSize - 1; i++) {
-      _head[i] = 0;
-    }
+    _head.fillRange(0, _hashSize, 0);
 
     _strStart = 0;
     _blockStart = 0;
@@ -277,16 +274,9 @@ class Deflate {
   }
 
   void _initBlock() {
-    // Initialize the trees.
-    for (var i = 0; i < lCodes; i++) {
-      _dynamicLengthTree[i * 2] = 0;
-    }
-    for (var i = 0; i < dCodes; i++) {
-      _dynamicDistTree[i * 2] = 0;
-    }
-    for (var i = 0; i < blCodes; i++) {
-      _bitLengthTree[i * 2] = 0;
-    }
+    _dynamicLengthTree.fillRange(0, lCodes * 2, 0);
+    _dynamicDistTree.fillRange(0, dCodes * 2, 0);
+    _bitLengthTree.fillRange(0, blCodes * 2, 0);
 
     _dynamicLengthTree[endBlock * 2] = 1;
     _optimalLen = _staticLen = 0;
@@ -1281,9 +1271,7 @@ class Deflate {
       case 9:
         return _DeflaterConfig(32, 258, 258, 4096, slow);
     }
-    // Should not happen: Level has been checked before.
     return null;
-    //throw ArchiveException('Invalid Deflate parameter');
   }
 
   static const maxMemLevel = 9;

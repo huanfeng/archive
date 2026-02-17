@@ -8,6 +8,8 @@ abstract class InputStream {
   /// The current endian order if the stream.
   ByteOrder byteOrder;
 
+  static const _utf8Decoder = Utf8Decoder();
+
   /// The current read position relative to the start of the buffer.
   int get position;
 
@@ -138,13 +140,10 @@ abstract class InputStream {
   String readString({int? size, bool utf8 = true}) {
     String codesToString(List<int> codes) {
       try {
-        final str = utf8
-            ? const Utf8Decoder().convert(codes)
-            : String.fromCharCodes(codes);
+        final str =
+            utf8 ? _utf8Decoder.convert(codes) : String.fromCharCodes(codes);
         return str;
       } catch (err) {
-        // If the string is not a valid UTF8 string, decode it as character
-        // codes.
         return String.fromCharCodes(codes);
       }
     }

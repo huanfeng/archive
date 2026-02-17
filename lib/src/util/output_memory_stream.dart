@@ -28,7 +28,6 @@ class OutputMemoryStream extends OutputStream {
   /// Clear the buffer.
   @override
   void clear() {
-    _buffer = Uint8List(defaultBufferSize);
     length = 0;
   }
 

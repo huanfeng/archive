@@ -119,10 +119,9 @@ class ZipDirectory {
       return;
     }
 
-    /*final zip64EOCDSize =*/ input
-      ..readUint64()
-      /*final zip64Version =*/ ..readUint16() /*final zip64VersionNeeded =*/
-      ..readUint16();
+    /*final zip64EOCDSize =*/ input.readUint64();
+    input.readUint16(); // zip64Version
+    input.readUint16(); // zip64VersionNeeded
     final zip64DiskNumber = input.readUint32();
     final zip64StartDisk = input.readUint32();
     final zip64NumEntriesOnDisk = input.readUint64();
@@ -154,7 +153,7 @@ class ZipDirectory {
     final pos = input.position;
     final length = input.length - 4;
     const bufferSize = 1024;
-    final chunkSize = length < bufferSize ? length : bufferSize;
+    final chunkSize = min(length, bufferSize);
 
     var startPos = length - chunkSize;
 

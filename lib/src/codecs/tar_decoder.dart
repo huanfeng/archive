@@ -54,11 +54,10 @@ class TarDecoder {
         continue;
       }
       if (tf.typeFlag == TarFile.exHeader || tf.typeFlag == TarFile.exHeader2) {
-        utf8
-            .decode(tf.rawContent!.toUint8List())
-            .split('\n')
-            .where((s) => paxRecordRegexp.hasMatch(s))
-            .forEach((record) {
+        utf8.decode(tf.rawContent!.toUint8List()).split('\n').forEach((record) {
+          if (!paxRecordRegexp.hasMatch(record)) {
+            return;
+          }
           final match = paxRecordRegexp.firstMatch(record)!;
           final keyword = match.group(2);
           final value = match.group(3)!;
