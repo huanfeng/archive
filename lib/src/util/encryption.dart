@@ -4,24 +4,24 @@ import 'dart:typed_data';
 // https://github.com/bcgit/pc-dart/tree/master
 // See LICENSE-other.md for license info.
 
-abstract class CipherParameters {}
+abstract class PcCipherParameters {}
 
-class Pbkdf2Parameters extends CipherParameters {
+class PcPbkdf2Parameters extends PcCipherParameters {
   final Uint8List salt;
   final int iterationCount;
   final int desiredKeyLength;
 
-  Pbkdf2Parameters(this.salt, this.iterationCount, this.desiredKeyLength);
+  PcPbkdf2Parameters(this.salt, this.iterationCount, this.desiredKeyLength);
 }
 
-abstract class KeyDerivator {
+abstract class PcKeyDerivator {
   int get keySize;
-  void init(CipherParameters params);
+  void init(PcCipherParameters params);
   Uint8List process(Uint8List data);
   int deriveKey(Uint8List inp, int inpOff, Uint8List out, int outOff);
 }
 
-abstract class BaseKeyDerivator implements KeyDerivator {
+abstract class PcBaseKeyDerivator implements PcKeyDerivator {
   @override
   Uint8List process(Uint8List data) {
     var out = Uint8List(keySize);
@@ -37,32 +37,32 @@ void arrayCopy(Uint8List? sourceArr, int sourcePos, Uint8List? outArr,
   }
 }
 
-abstract class Mac {
+abstract class PcMac {
   int get macSize;
 
   void reset();
-  void init(CipherParameters params);
+  void init(PcCipherParameters params);
   Uint8List process(Uint8List data);
   void updateByte(int inp);
   void update(Uint8List inp, int inpOff, int len);
   int doFinal(Uint8List out, int outOff);
 }
 
-class KeyParameter extends CipherParameters {
+class PcKeyParameter extends PcCipherParameters {
   late Uint8List key;
-  KeyParameter(this.key);
-  KeyParameter.offset(Uint8List key, int keyOff, int keyLen) {
+  PcKeyParameter(this.key);
+  PcKeyParameter.offset(Uint8List key, int keyOff, int keyLen) {
     this.key = Uint8List(keyLen);
     arrayCopy(key, keyOff, this.key, 0, keyLen);
   }
 }
 
-class PBKDF2KeyDerivator extends BaseKeyDerivator {
-  late Pbkdf2Parameters _params;
-  final Mac _mac;
+class PcPBKDF2KeyDerivator extends PcBaseKeyDerivator {
+  late PcPbkdf2Parameters _params;
+  final PcMac _mac;
   late Uint8List _state;
 
-  PBKDF2KeyDerivator(this._mac) {
+  PcPBKDF2KeyDerivator(this._mac) {
     _state = Uint8List(_mac.macSize);
   }
 
@@ -75,7 +75,7 @@ class PBKDF2KeyDerivator extends BaseKeyDerivator {
   }
 
   @override
-  void init(covariant Pbkdf2Parameters params) {
+  void init(covariant PcPbkdf2Parameters params) {
     _params = params;
   }
 
@@ -88,7 +88,7 @@ class PBKDF2KeyDerivator extends BaseKeyDerivator {
     var outBytes = Uint8List(l * hLen);
     var outPos = 0;
 
-    CipherParameters param = KeyParameter(inp.sublist(inpOff));
+    PcCipherParameters param = PcKeyParameter(inp.sublist(inpOff));
     _mac.init(param);
 
     for (var i = 1; i <= l; i++) {
@@ -131,7 +131,7 @@ class PBKDF2KeyDerivator extends BaseKeyDerivator {
   }
 }
 
-abstract class BaseMac implements Mac {
+abstract class PcBaseMac implements PcMac {
   @override
   Uint8List process(Uint8List data) {
     update(data, 0, data.length);
@@ -141,7 +141,7 @@ abstract class BaseMac implements Mac {
   }
 }
 
-abstract class BaseDigest implements Digest {
+abstract class PcBaseDigest implements PcDigest {
   @override
   Uint8List process(Uint8List data) {
     update(data, 0, data.length);
@@ -236,15 +236,15 @@ int rotr32(int x, int n) {
   return (x >> n) | shiftl32(x, 32 - n);
 }
 
-class Register64 {
+class PcRegister64 {
   late int _hi32;
   late int _lo32;
 
-  Register64([Object hiOrLo32OrY = 0, int? lo32]) {
+  PcRegister64([Object hiOrLo32OrY = 0, int? lo32]) {
     if (hiOrLo32OrY is int) {
       setInt(hiOrLo32OrY, lo32);
     } else {
-      set(hiOrLo32OrY as Register64, lo32);
+      set(hiOrLo32OrY as PcRegister64, lo32);
     }
   }
 
@@ -252,15 +252,15 @@ class Register64 {
   int get hi32 => _hi32;
 
   @override
-  bool operator ==(Object other) => other is Register64
+  bool operator ==(Object other) => other is PcRegister64
       ? (((_hi32 == other._hi32) && (_lo32 == other._lo32)))
       : false;
-  bool operator <(Register64 y) =>
+  bool operator <(PcRegister64 y) =>
       (_hi32 < y._hi32) || ((_hi32 == y._hi32) && (_lo32 < y._lo32));
-  bool operator <=(Register64 y) => (this < y) || (this == y);
-  bool operator >(Register64 y) =>
+  bool operator <=(PcRegister64 y) => (this < y) || (this == y);
+  bool operator >(PcRegister64 y) =>
       (_hi32 > y._hi32) || ((_hi32 == y._hi32) && (_lo32 > y._lo32));
-  bool operator >=(Register64 y) => (this > y) || (this == y);
+  bool operator >=(PcRegister64 y) => (this > y) || (this == y);
 
   void setInt(int hiOrLo32OrY, [int? lo32]) {
     if (lo32 == null) {
@@ -275,7 +275,7 @@ class Register64 {
     }
   }
 
-  void set(Register64 hiOrLo32OrY, [int? lo32]) {
+  void set(PcRegister64 hiOrLo32OrY, [int? lo32]) {
     if (lo32 == null) {
       _hi32 = hiOrLo32OrY._hi32;
       _lo32 = hiOrLo32OrY._lo32;
@@ -292,7 +292,7 @@ class Register64 {
     }
   }
 
-  void sumReg(Register64 y) {
+  void sumReg(PcRegister64 y) {
     var slo32 = _lo32 + y._lo32;
     _lo32 = slo32 & _mask32;
     var carry = ((slo32 != _lo32) ? 1 : 0);
@@ -337,17 +337,17 @@ class Register64 {
     _hi32 = shi32 & _mask32;
   }
 
-  void and(Register64 y) {
+  void and(PcRegister64 y) {
     _hi32 &= y._hi32;
     _lo32 &= y._lo32;
   }
 
-  void or(Register64 y) {
+  void or(PcRegister64 y) {
     _hi32 |= y._hi32;
     _lo32 |= y._lo32;
   }
 
-  void xor(Register64 y) {
+  void xor(PcRegister64 y) {
     _hi32 ^= y._hi32;
     _lo32 ^= y._lo32;
   }
@@ -494,8 +494,8 @@ class Register64 {
   int get hashCode => Object.hash(_hi32, _lo32);
 }
 
-abstract class MD4FamilyDigest extends BaseDigest {
-  final _byteCount = Register64(0);
+abstract class PcMD4FamilyDigest extends PcBaseDigest {
+  final _byteCount = PcRegister64(0);
 
   final _wordBuffer = Uint8List(4);
   late int _wordBufferOffset;
@@ -508,7 +508,7 @@ abstract class MD4FamilyDigest extends BaseDigest {
   final List<int> buffer;
   late int bufferOffset;
 
-  MD4FamilyDigest(this._endian, int stateSize, int bufferSize,
+  PcMD4FamilyDigest(this._endian, int stateSize, int bufferSize,
       [int? packedStateSize])
       : _packedStateSize =
             (packedStateSize == null) ? stateSize : packedStateSize,
@@ -554,7 +554,7 @@ abstract class MD4FamilyDigest extends BaseDigest {
 
   @override
   int doFinal(Uint8List out, int outOff) {
-    var bitLength = Register64(_byteCount)..shiftl(3);
+    var bitLength = PcRegister64(_byteCount)..shiftl(3);
 
     _processPadding();
     _processLength(bitLength);
@@ -635,7 +635,7 @@ abstract class MD4FamilyDigest extends BaseDigest {
     }
   }
 
-  void _processLength(Register64 bitLength) {
+  void _processLength(PcRegister64 bitLength) {
     if (bufferOffset > 14) {
       _doProcessBlock();
     }
@@ -664,7 +664,7 @@ abstract class MD4FamilyDigest extends BaseDigest {
   }
 }
 
-abstract class Digest {
+abstract class PcDigest {
   int get digestSize;
   int get byteLength;
   void reset();
@@ -675,10 +675,10 @@ abstract class Digest {
 }
 
 /// Implementation of SHA-1 digest
-class SHA1Digest extends MD4FamilyDigest implements Digest {
+class PcSHA1Digest extends PcMD4FamilyDigest implements PcDigest {
   static const _digestLength = 20;
 
-  SHA1Digest() : super(Endian.big, 5, 80);
+  PcSHA1Digest() : super(Endian.big, 5, 80);
 
   @override
   final digestSize = _digestLength;
@@ -805,10 +805,10 @@ class SHA1Digest extends MD4FamilyDigest implements Digest {
 }
 
 /// Implementation of SHA-256 digest.
-class SHA256Digest extends MD4FamilyDigest implements Digest {
+class PcSHA256Digest extends PcMD4FamilyDigest implements PcDigest {
   static const _digestLength = 32;
 
-  SHA256Digest() : super(Endian.big, 8, 64);
+  PcSHA256Digest() : super(Endian.big, 8, 64);
 
   @override
   final digestSize = _digestLength;
@@ -992,24 +992,24 @@ class SHA256Digest extends MD4FamilyDigest implements Digest {
   int get byteLength => 64;
 }
 
-class HMac extends BaseMac {
+class PcHMac extends PcBaseMac {
   static final _ipad = 0x36;
   static final _opad = 0x5C;
 
-  final Digest _digest;
+  final PcDigest _digest;
   late int _digestSize;
   late int _blockLength;
 
   late Uint8List _inputPad;
   late Uint8List _outputBuf;
 
-  HMac(this._digest, this._blockLength) {
+  PcHMac(this._digest, this._blockLength) {
     _digestSize = _digest.digestSize;
     _inputPad = Uint8List(_blockLength);
     _outputBuf = Uint8List(_blockLength + _digestSize);
   }
 
-  HMac.withDigest(this._digest) {
+  PcHMac.withDigest(this._digest) {
     _blockLength = _digest.byteLength;
 
     _digestSize = _digest.digestSize;
@@ -1027,7 +1027,7 @@ class HMac extends BaseMac {
   }
 
   @override
-  void init(covariant KeyParameter params) {
+  void init(covariant PcKeyParameter params) {
     _digest.reset();
 
     var key = params.key;
@@ -1081,15 +1081,15 @@ class HMac extends BaseMac {
   }
 }
 
-abstract class BlockCipher {
+abstract class PcBlockCipher {
   int get blockSize;
   void reset();
-  void init(bool forEncryption, CipherParameters? params);
+  void init(bool forEncryption, PcCipherParameters? params);
   Uint8List process(Uint8List data);
   int processBlock(Uint8List inp, int inpOff, Uint8List out, int outOff);
 }
 
-abstract class BaseBlockCipher implements BlockCipher {
+abstract class PcBaseBlockCipher implements PcBlockCipher {
   @override
   Uint8List process(Uint8List data) {
     var out = Uint8List(blockSize);
@@ -1098,7 +1098,7 @@ abstract class BaseBlockCipher implements BlockCipher {
   }
 }
 
-class AESEngine extends BaseBlockCipher {
+class PcAESEngine extends PcBaseBlockCipher {
   int _rounds = 0;
   late List<List<int>> _workingKey;
   bool _forEncryption = false;
@@ -2220,7 +2220,7 @@ class AESEngine extends BaseBlockCipher {
   void reset() {}
 
   @override
-  void init(bool forEncryption, covariant KeyParameter params) {
+  void init(bool forEncryption, covariant PcKeyParameter params) {
     _forEncryption = forEncryption;
 
     _workingKey = generateWorkingKey(forEncryption, params);
@@ -2232,7 +2232,8 @@ class AESEngine extends BaseBlockCipher {
     }
   }
 
-  List<List<int>> generateWorkingKey(bool forEncryption, KeyParameter params) {
+  List<List<int>> generateWorkingKey(
+      bool forEncryption, PcKeyParameter params) {
     var key = params.key;
     var keyLen = key.length;
     if (keyLen < 16 || keyLen > 32 || (keyLen & 7) != 0) {

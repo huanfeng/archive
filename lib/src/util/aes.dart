@@ -15,9 +15,9 @@ class Uint8ListEquality {
 }
 
 class AesCipherUtil {
-  static HMac getMacBasedPRF(Uint8List derivedKey) {
-    var mac = HMac(SHA1Digest(), 64);
-    mac.init(KeyParameter(derivedKey));
+  static PcHMac getMacBasedPRF(Uint8List derivedKey) {
+    var mac = PcHMac(PcSHA1Digest(), 64);
+    mac.init(PcKeyParameter(derivedKey));
     return mac;
   }
 
@@ -41,8 +41,8 @@ class Aes {
   Uint8List derivedKey;
   int aesKeyStrength;
   bool encrypt;
-  AESEngine? aesEngine;
-  late HMac _macGen;
+  PcAESEngine? aesEngine;
+  late PcHMac _macGen;
   late Uint8List mac;
 
   int processData(Uint8List buff, int start, int len) {
@@ -74,8 +74,8 @@ class Aes {
 
   Aes(this.derivedKey, Uint8List hmacDerivedKey, this.aesKeyStrength,
       {this.encrypt = false}) {
-    aesEngine = AESEngine();
-    aesEngine!.init(true, KeyParameter(derivedKey));
+    aesEngine = PcAESEngine();
+    aesEngine!.init(true, PcKeyParameter(derivedKey));
     _macGen = AesCipherUtil.getMacBasedPRF(hmacDerivedKey);
   }
 }

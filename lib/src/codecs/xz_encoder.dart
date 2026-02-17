@@ -148,7 +148,7 @@ class XZEncoder {
         output.writeUint64(getCrc64(data));
         break;
       case 0x0a: // SHA-256
-        output.writeBytes(SHA256Digest().process(data));
+        output.writeBytes(PcSHA256Digest().process(data));
         break;
       default:
         throw 'Unknown check type $checkType';

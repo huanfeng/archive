@@ -351,8 +351,8 @@ class ZipFile extends FileContent {
     const iterationCount = 1000;
     final totalSize = (derivedKeyLength * 2) + 2;
 
-    final params = Pbkdf2Parameters(salt, iterationCount, totalSize);
-    final keyDerivator = PBKDF2KeyDerivator(HMac(SHA1Digest(), 64));
+    final params = PcPbkdf2Parameters(salt, iterationCount, totalSize);
+    final keyDerivator = PcPBKDF2KeyDerivator(PcHMac(PcSHA1Digest(), 64));
 
     keyDerivator.init(params);
     return keyDerivator.process(passwordBytes);
