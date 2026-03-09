@@ -55,7 +55,7 @@ class ZipFileHeader {
       // we ignore it for better compatibility.
       if (extraLen >= 4) {
         final extra = InputMemoryStream(extraField!);
-        while (!extra.isEOS) {
+        while (extra.length >= 4) {
           final id = extra.readUint16();
           var size = extra.readUint16();
           final extraBytes = extra.readBytes(size);
